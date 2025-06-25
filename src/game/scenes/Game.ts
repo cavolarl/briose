@@ -1,58 +1,44 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { Deck } from '../helpers/Deck';
+import { Player } from '../helpers/Player';
+import { GameManager } from '../helpers/GameManager';
+import { renderHand } from '../helpers/renderHand';
 
-export class Game extends Scene
-{
+export class Game extends Scene{
+    deck: Deck;
+    manager: GameManager;
+    player: Player;
+
     constructor ()
     {
         super('Game');
     }
 
     preload() {
-    this.load.image('clubs', 'assets/card-clubs-1.png');
-    this.load.image('diamonds', 'assets/card-diamonds-1.png');
-    this.load.image('hearts', 'assets/card-hearts-1.png');
-    this.load.image('spades', 'assets/card-spades-1.png');
-    this.load.image('back', 'assets/card-back1.png');
+    // Load all card images from the assets folder
+        this.load.setBaseURL('assets');
+        const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
+        const values = ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
+        suits.forEach(suit => {
+            values.forEach(value => {
+                this.load.image(`${suit}-${value}`, `card-${suit}-${value}.png`);
+            });
+        });
+        // Load the back of the card
+        this.load.image('back', 'card-back1.png');
     }
 
+    create() {
+        this.cameras.main.setBackgroundColor('#6aa84f');
 
-    create ()
-{
-    this.cameras.main.setBackgroundColor('#6aa84f');
+        this.manager = new GameManager(['You', 'Computer']);
+        this.player = this.manager.players[0];
 
-    const cardWidth = 100;
-    const cardHeight = 140;
-    const cardSpacing = 20;
+        EventBus.emit('current-scene-ready', this);
 
-    const cardPositions = [
-        { x: 100, y: 100, key: 'clubs' },
-        { x: 100 + cardWidth + cardSpacing, y: 100, key: 'diamonds' },
-        { x: 100 + 2 * (cardWidth + cardSpacing), y: 100, key: 'hearts' },
-        { x: 100 + 3 * (cardWidth + cardSpacing), y: 100, key: 'spades' }
-    ];
+        renderHand(this, this.player, this.manager);
+    }
 
-    cardPositions.forEach(pos => {
-        // Start with the card back
-        const cardBack = this.add.image(pos.x, pos.y, 'back')
-            .setOrigin(0.5)
-            .setDisplaySize(cardWidth, cardHeight)
-            .setInteractive();
-
-        // Create the face but make it invisible initially
-        const cardFace = this.add.image(pos.x, pos.y, pos.key)
-            .setOrigin(0.5)
-            .setDisplaySize(cardWidth, cardHeight)
-            .setVisible(false);
-
-        // On click, hide the back and show the face
-        cardBack.on('pointerdown', () => {
-            cardBack.setVisible(false);
-            cardFace.setVisible(true);
-        });
-    });
-
-    EventBus.emit('current-scene-ready', this);
-}
 
 }
