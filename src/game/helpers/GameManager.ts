@@ -1,10 +1,12 @@
 import { Deck } from './Deck';
 import { Player } from './Player';
+import { handleAITurn } from './AiManager';
+
 
 export class GameManager {
     deck: Deck;
     players: Player[];
-    currentPlayerIndex: number = 0;
+    turnIndex: number = 0;
 
     constructor(playerNames: string[]) {
         this.deck = new Deck();
@@ -16,13 +18,10 @@ export class GameManager {
         });
     }
 
-    get currentPlayer(): Player {
-        return this.players[this.currentPlayerIndex];
+    nextTurn() {
+        this.turnIndex = (this.turnIndex + 1) % this.players.length;
     }
 
-    nextTurn() {
-        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-    }
 
     askPlayerForCard(asker: Player, responder: Player, value: string): boolean {
         if (responder.hasValue(value)) {

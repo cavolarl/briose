@@ -4,15 +4,17 @@ import { Deck } from '../helpers/Deck';
 import { Player } from '../helpers/Player';
 import { GameManager } from '../helpers/GameManager';
 import { renderHand } from '../helpers/renderHand';
+import { handleAITurn } from '../helpers/AiManager';
+import { Asker } from '../helpers/Asker';
 
-export class Game extends Scene{
+export class GameScene extends Scene{
     deck: Deck;
     manager: GameManager;
     player: Player;
 
     constructor ()
     {
-        super('Game');
+        super('GameScene');
     }
 
     preload() {
@@ -36,9 +38,11 @@ export class Game extends Scene{
         this.player = this.manager.players[0];
 
         EventBus.emit('current-scene-ready', this);
-
-        renderHand(this, this.player, this.manager);
+        this.updateHand();
     }
 
+    updateHand() {
+        renderHand(this, this.player, this.manager);
+    }
 
 }

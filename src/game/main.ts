@@ -1,4 +1,6 @@
-import { Game as MainGame } from './scenes/Game';
+import { GameScene } from './scenes/GameScene';
+import { GameOver } from './scenes/GameOver';
+import { MainMenu } from './scenes/MainMenu';
 import { AUTO, Game } from 'phaser';
 
 // Find out more information about the Game Config at:
@@ -7,7 +9,7 @@ const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     parent: 'game-container',
     backgroundColor: '#028af8',
-    scene: [MainGame],
+    scene: [MainMenu, GameScene, GameOver],
     scale: {
         mode: Phaser.Scale.RESIZE,
         width: '100%',

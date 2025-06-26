@@ -25,6 +25,10 @@ export function renderHand(
     const pLabelX = screenWidth * 0.1;
     const pLabelY = screenHeight * 0.7;
 
+    const bookSize = 40;
+    const bookSpacing = bookSize + 6;
+
+    // Render computer's cards as card backs
     manager.players[1].hand.forEach((_, index) => {
         scene.add.image(
             npLabelX + index * cardSpacing,
@@ -35,7 +39,22 @@ export function renderHand(
         .setOrigin(0.5);
     });
 
-    // Group cards by value
+    // Render computer's books
+    scene.add.text(npLabelX, npLabelY, `Computer's Books:`, {
+        fontSize: '16px',
+        fontFamily: 'monospace'
+    });
+    manager.players[1].books.forEach((_, index) => {
+        scene.add.image(
+            npLabelX + index * bookSpacing,
+            npLabelY + 20,
+            'back'
+        )
+        .setDisplaySize(bookSize, bookSize)
+        .setOrigin(0.5);
+    });
+
+    // Group player cards by value
     const grouped: { [value: string]: string[] } = {};
     for (const card of player.hand) {
         const [, value] = card.split('-');
@@ -45,9 +64,9 @@ export function renderHand(
 
     const values = Object.keys(grouped).sort();
 
-    // Calculate total width for all groups for horizontal centering
+    // Render player hand
     const totalWidth = values.length * (cardWidth + cardSpacing) - cardSpacing;
-    let startX = (screenWidth - totalWidth) / 2;
+    const startX = (screenWidth - totalWidth) / 2;
 
     values.forEach((value, groupIndex) => {
         const group = grouped[value];
@@ -63,11 +82,29 @@ export function renderHand(
         });
     });
 
-    // Deck count display (bottom right)
+    // Render player books
+    const playerBooksY = screenHeight * 0.85;
+    scene.add.text(pLabelX, playerBooksY, `${player.name}'s Books:`, {
+        fontSize: '16px',
+        fontFamily: 'monospace'
+    });
+    player.books.forEach((_, index) => {
+        scene.add.image(
+            pLabelX + index * bookSpacing,
+            playerBooksY + 20,
+            'back'
+        )
+        .setDisplaySize(bookSize, bookSize)
+        .setOrigin(0.5);
+    });
+
+    // Deck count display
     scene.add.text(screenWidth * 0.85, screenHeight * 0.9, `${manager.deck.cards.length} cards left`, {
         fontSize: '18px'
     });
 
-    // Render the ask buttons
+    // Render Asker if it's the player's turn
+    if (manager.turnIndex === 0) {
     Asker(scene, player, manager);
+    }
 }
