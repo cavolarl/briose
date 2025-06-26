@@ -28,12 +28,18 @@ export class GameManager {
             const taken = responder.removeCards(value);
             asker.addCards(taken);
             asker.checkForBooks();
-            return true; // successful guess
+            return true;
         } else {
-            const drawn = this.deck.draw(1);
+            let drawn: ReturnType<Deck['draw']>;
+            if (this.deck.isEmpty()) {
+                drawn = [];
+                console.log("Deck is empty, no cards to draw.");
+            } else {
+                drawn = this.deck.draw(1);
+            }
             asker.addCards(drawn);
             asker.checkForBooks();
-            return false; // go fish
+            return false;
         }
     }
 

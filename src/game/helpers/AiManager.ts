@@ -11,15 +11,17 @@ export function handleAITurn(manager: GameManager, scene: Scene) {
     const chosenValue = Phaser.Utils.Array.GetRandom(values);
 
     console.log(`AI asks for ${chosenValue}`);
+    console.log(`AI's hand: ${ai.hand.join(', ')}`);
 
     const success = manager.askPlayerForCard(ai, player, chosenValue);
 
     if (!success) {
         console.log(`AI asked for ${chosenValue}, but you have no cards of that value.`);
-        const drawn = manager.deck.draw(1);
-        ai.addCards(drawn);
-        ai.checkForBooks();
-        console.log(`AI drew a card from the deck.`);
+        if (manager.deck.cards.length > 0) {
+            console.log(`AI drew a card from the deck.`);
+        } else {
+            console.log(`No cards left in the deck for AI to draw.`);
+        }
 
         renderHand(scene, player, manager);
 
@@ -28,13 +30,12 @@ export function handleAITurn(manager: GameManager, scene: Scene) {
             manager.nextTurn();
             renderHand(scene, player, manager);
             if (manager.turnIndex === 0) {
-                Asker(scene, player, manager);
+                renderHand(scene, player, manager);
             }
         });
 
     } else {
         console.log(`AI successfully asked for ${chosenValue}.`);
-        ai.checkForBooks();
         renderHand(scene, player, manager);
 
         // Continue AI turn after delay

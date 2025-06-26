@@ -79,6 +79,16 @@ export function Asker(scene: Scene, player: Player, manager: GameManager) {
             } else {
                 scene.time.delayedCall(1000, () => {
                     handleAITurn(manager, scene);
+
+                    // After AI turn, check for game over again
+                    scene.time.delayedCall(1100, () => {
+                        if (manager.isGameOver()) {
+                            const playerBooks = manager.players[0].books.length;
+                            const opponentBooks = manager.players[1].books.length;
+                            const winner = playerBooks > opponentBooks ? 'You' : 'Computer';
+                            scene.scene.start('GameOver', { winner });
+                        }
+                    });
                 });
             }
         });

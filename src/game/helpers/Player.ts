@@ -12,19 +12,22 @@ export class Player {
     }
 
     removeCards(value: string): string[] {
-        const matches = this.hand.filter(card => card.includes(`-${value}`));
-        this.hand = this.hand.filter(card => !card.includes(`-${value}`));
+        // Remove only cards with exact rank match
+        const matches = this.hand.filter(card => card.split('-')[1] === value);
+        this.hand = this.hand.filter(card => card.split('-')[1] !== value);
         return matches;
     }
 
     hasValue(value: string): boolean {
-        return this.hand.some(card => card.includes(`-${value}`));
+        // Check for exact rank match
+        return this.hand.some(card => card.split('-')[1] === value);
     }
 
     // Logic to check for books (four of a kind)
     checkForBooks(): string[] {
         const counts: { [value: string]: number } = {};
 
+        // Count occurrences of each rank
         this.hand.forEach(card => {
             const value = card.split('-')[1];
             counts[value] = (counts[value] || 0) + 1;
@@ -39,6 +42,8 @@ export class Player {
                 completedBooks.push(value);
             }
         }
+
+        console.log(`${this.name} completed books: ${completedBooks.join(', ')}`);
 
         return completedBooks;
     }
