@@ -34,11 +34,12 @@ export class GameScene extends Scene{
     create() {
         this.cameras.main.setBackgroundColor('#6aa84f');
 
-        this.manager = new GameManager(['You', 'Computer']);
+        this.manager = new GameManager(['1', '2']);
         this.player = this.manager.players[0];
 
         EventBus.emit('current-scene-ready', this);
         this.updateHand();
+
     }
 
     updateHand() {

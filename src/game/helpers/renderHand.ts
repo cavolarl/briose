@@ -8,13 +8,20 @@ export function renderHand(
     player: Player,
     manager: GameManager
 ): void {
-    scene.children.removeAll();
+
+    // Clear previous hand display
+    scene.children.getAll().forEach(child => {
+        if (child instanceof Phaser.GameObjects.Image ||
+            child instanceof Phaser.GameObjects.Text) {
+            child.destroy();
+        }
+    });
 
     const cardWidth = 100;
     const cardHeight = 140;
     const npcardWidth = 50;
     const npcardHeight = 70;
-    const cardSpacing = 30;
+    const cardSpacing = 20;
     const stackOffsetY = 10;
 
     const screenWidth = scene.scale.width;
@@ -25,7 +32,7 @@ export function renderHand(
     const pLabelX = screenWidth * 0.1;
     const pLabelY = screenHeight * 0.7;
 
-    const bookSize = 40;
+    const bookSize = 30;
     const bookSpacing = bookSize + 6;
 
     // Render computer's cards as card backs
@@ -36,21 +43,6 @@ export function renderHand(
             'back'
         )
         .setDisplaySize(npcardWidth, npcardHeight)
-        .setOrigin(0.5);
-    });
-
-    // Render computer's books
-    scene.add.text(npLabelX, npLabelY, `Computer's Books:`, {
-        fontSize: '16px',
-        fontFamily: 'monospace'
-    });
-    manager.players[1].books.forEach((_, index) => {
-        scene.add.image(
-            npLabelX + index * bookSpacing,
-            npLabelY + 20,
-            'back'
-        )
-        .setDisplaySize(bookSize, bookSize)
         .setOrigin(0.5);
     });
 
@@ -82,25 +74,29 @@ export function renderHand(
         });
     });
 
-    // Render player books
-    const playerBooksY = screenHeight * 0.85;
-    scene.add.text(pLabelX, playerBooksY, `${player.name}'s Books:`, {
-        fontSize: '16px',
-        fontFamily: 'monospace'
+    // Deck count display
+    scene.add.text(screenWidth * 0.85, screenHeight * 0.9, `${manager.deck.cards.length} cards left`, {
+        fontSize: '18px'
     });
-    player.books.forEach((_, index) => {
+
+    manager.players[1].books.forEach((_, index) => {
         scene.add.image(
-            pLabelX + index * bookSpacing,
-            playerBooksY + 20,
+            npLabelX + index * bookSpacing,
+            npLabelY + 20,
             'back'
         )
         .setDisplaySize(bookSize, bookSize)
         .setOrigin(0.5);
     });
 
-    // Deck count display
-    scene.add.text(screenWidth * 0.85, screenHeight * 0.9, `${manager.deck.cards.length} cards left`, {
-        fontSize: '18px'
+    player.books.forEach((_, index) => {
+        scene.add.image(
+            pLabelX + index * bookSpacing,
+            pLabelY + 20,
+            'back'
+        )
+        .setDisplaySize(bookSize, bookSize)
+        .setOrigin(0.5);
     });
 
     // Render Asker if it's the player's turn
