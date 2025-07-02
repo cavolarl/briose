@@ -1,43 +1,40 @@
 import Phaser from 'phaser';
-import { currentTheme } from '../EventBus';
+import { setTheme, themes, currentTheme } from '../EventBus';
 
-export class MainMenu extends Phaser.Scene {
+export class ThemeSelection extends Phaser.Scene {
     constructor() {
-        super({ key: 'MainMenu' });
+        super({ key: 'ThemeSelection' });
     }
 
     preload() {
-        // Add assets to load here later
     }
 
     create() {
         const { width, height } = this.scale;
 
-        // Add a background color
         this.cameras.main.setBackgroundColor(currentTheme.backgroundColor);
 
-        // Add a title text
-        this.add.text(width / 2, height / 2 - 100, 'My Game', {
+        this.add.text(width / 2, height / 2 - 200, 'Select Theme', {
             fontSize: '48px',
-            color: currentTheme.textColor,
+            color: '#ffffff',
             fontFamily: 'Arial',
         }).setOrigin(0.5);
 
-        const menuOptions = [
-            { text: 'Play', scene: 'GameScene' },
-            { text: 'Themes', scene: 'ThemeSelection' },
-        ];
+        const menuOptions = themes.map(theme => ({ text: theme.name, action: () => setTheme(theme) }));
+        menuOptions.push({ text: 'Back', action: () => this.scene.start('MainMenu') });
 
         let selectedOptionIndex = 0;
         const optionTexts: Phaser.GameObjects.Text[] = [];
 
+        let yOffset = -50;
         menuOptions.forEach((option, index) => {
-            const optionText = this.add.text(width / 2, height / 2 + index * 80, option.text, {
+            const optionText = this.add.text(width / 2, height / 2 + yOffset, option.text, {
                 fontSize: '32px',
                 color: currentTheme.textColor,
                 fontFamily: 'Arial',
             }).setOrigin(0.5);
             optionTexts.push(optionText);
+            yOffset += 80;
         });
 
         const updateSelection = () => {
@@ -58,7 +55,8 @@ export class MainMenu extends Phaser.Scene {
             });
 
             this.input.keyboard.on('keydown-ENTER', () => {
-                this.scene.start(menuOptions[selectedOptionIndex].scene);
+                menuOptions[selectedOptionIndex].action();
+                this.scene.start('MainMenu');
             });
         }
 

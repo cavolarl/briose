@@ -2,20 +2,33 @@ import { Scene } from 'phaser';
 import { Player } from './Player';
 import { GameManager } from './GameManager';
 import { Asker } from './Asker';
+import { currentTheme } from '../EventBus';
+
+let playerCardImages: Phaser.GameObjects.Image[] = [];
+let opponentCardImages: Phaser.GameObjects.Image[] = [];
+let deckCountText: Phaser.GameObjects.Text | null = null;
+let playerBookImages: Phaser.GameObjects.Image[] = [];
+let opponentBookImages: Phaser.GameObjects.Image[] = [];
 
 export function renderHand(
     scene: Scene,
     player: Player,
     manager: GameManager
 ): void {
+    // Destroy previous objects created by renderHand
+    playerCardImages.forEach(img => img.destroy());
+    opponentCardImages.forEach(img => img.destroy());
+    playerBookImages.forEach(img => img.destroy());
+    opponentBookImages.forEach(img => img.destroy());
+    if (deckCountText) {
+        deckCountText.destroy();
+    }
 
-    // Clear previous hand display
-    scene.children.getAll().forEach(child => {
-        if (child instanceof Phaser.GameObjects.Image ||
-            child instanceof Phaser.GameObjects.Text) {
-            child.destroy();
-        }
-    });
+    playerCardImages = [];
+    opponentCardImages = [];
+    playerBookImages = [];
+    opponentBookImages = [];
+    deckCountText = null;
 
     const cardWidth = 100;
     const cardHeight = 140;
@@ -37,13 +50,14 @@ export function renderHand(
 
     // Render computer's cards as card backs
     manager.players[1].hand.forEach((_, index) => {
-        scene.add.image(
+        const cardImage = scene.add.image(
             npLabelX + index * cardSpacing,
             npLabelY + 50,
-            'back'
+            currentTheme.cardBack
         )
         .setDisplaySize(npcardWidth, npcardHeight)
         .setOrigin(0.5);
+        opponentCardImages.push(cardImage);
     });
 
     // Group player cards by value
@@ -64,39 +78,42 @@ export function renderHand(
         const group = grouped[value];
         group.forEach((card, stackIndex) => {
             const [suit] = card.split('-');
-            scene.add.image(
+            const cardImage = scene.add.image(
                 startX + groupIndex * (cardWidth + cardSpacing),
                 pLabelY + 60 + stackIndex * stackOffsetY,
                 `${suit}-${value}`
             )
             .setOrigin(0.5)
             .setDisplaySize(cardWidth, cardHeight);
+            playerCardImages.push(cardImage);
         });
     });
 
     // Deck count display
-    scene.add.text(screenWidth * 0.85, screenHeight * 0.9, `${manager.deck.cards.length} cards left`, {
+    deckCountText = scene.add.text(screenWidth * 0.85, screenHeight * 0.9, `${manager.deck.cards.length} cards left`, {
         fontSize: '18px'
     });
 
     manager.players[1].books.forEach((_, index) => {
-        scene.add.image(
+        const bookImage = scene.add.image(
             npLabelX + index * bookSpacing,
             npLabelY + 20,
-            'back'
+            currentTheme.cardBack
         )
         .setDisplaySize(bookSize, bookSize)
         .setOrigin(0.5);
+        opponentBookImages.push(bookImage);
     });
 
     player.books.forEach((_, index) => {
-        scene.add.image(
+        const bookImage = scene.add.image(
             pLabelX + index * bookSpacing,
             pLabelY + 20,
-            'back'
+            currentTheme.cardBack
         )
         .setDisplaySize(bookSize, bookSize)
         .setOrigin(0.5);
+        playerBookImages.push(bookImage);
     });
 
     // Render Asker if it's the player's turn
