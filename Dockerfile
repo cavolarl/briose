@@ -1,19 +1,10 @@
-FROM node:24-alpine3.21 AS build
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-
-RUN npm install
-
+FROM node:lts-alpine
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production --silent && mv node_modules ../
 COPY . .
-
-RUN npm run build
-
-FROM nginx:alpine
-
-COPY --from=build /app/dist/template-angular /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3000 4200
+RUN chown -R node /usr/src/app
+USER node
+CMD ["npm", "start"]
