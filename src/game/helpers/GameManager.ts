@@ -43,6 +43,18 @@ export class GameManager {
         }
     }
 
+    drawCard(player: Player): string[] {
+        if (this.deck.isEmpty()) {
+            console.log("Deck is empty, no cards to draw.");
+            return [];
+        }
+
+        const drawn = this.deck.draw(1);
+        player.addCards(drawn);
+        return drawn;
+    }
+
+
     isGameOver(): boolean {
         return this.deck.isEmpty() && this.players.every(p => p.hand.length === 0);
     }
