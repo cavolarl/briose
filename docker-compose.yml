@@ -1,5 +1,6 @@
 services:
   templateangular:
+    container_name: angularcontainer
     image: templateangular
     build:
       context: .

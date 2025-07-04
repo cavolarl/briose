@@ -5,126 +5,130 @@ import { renderHand } from './renderHand';
 import { handleAITurn } from './AiManager';
 import { currentTheme } from '../EventBus';
 
-let askButtons: Phaser.GameObjects.Text[] = [];
+let askContainer: Phaser.GameObjects.Container | null = null;
 let selectedOptionIndex = 0;
-let askBoxGraphics: Phaser.GameObjects.Graphics | null = null;
 
 export function Asker(scene: Scene, player: Player, manager: GameManager) {
-    // Input is always enabled when rendering Asker
+    if (askContainer) {
+        askContainer.destroy(true);
+        askContainer = null;
+    }
+
+    selectedOptionIndex = 0;
     scene.input.enabled = true;
+
     const screenWidth = scene.scale.width;
     const screenHeight = scene.scale.height;
 
-    const ranksInHand = Array.from(new Set(
-        player.hand.map(card => card.split('-')[1])
-    ));
+    
+    // Logic to handle the case where the player has no cards left, uncertain if this works as intended due to difficulty debugging
+    if (player.hand.length === 0 && !manager.deck.isEmpty()) {
+        manager.drawCard(player);
+        player.checkForBooks();
+        renderHand(scene, player, manager);
+        manager.nextTurn();
 
-    const menuOptions = ranksInHand.map(rank => ({ text: rank, value: rank }));
+        scene.time.delayedCall(500, () => {
+            handleAITurn(manager, scene);
+            scene.time.delayedCall(600, () => {
+                if (manager.isGameOver()) {
+                    const winner = manager.players[0].books.length > manager.players[1].books.length ? 'You' : 'Computer';
+                    scene.scene.start('GameOver', { winner });
+                } else {
+                    Asker(scene, player, manager);
+                }
+            });
+        });
+        return;
+    }
+    const ranks = Array.from(new Set(player.hand.map(c => c.split('-')[1])));
+    const menu = ranks.map(r => ({ text: r, value: r }));
 
-    const boxWidth = 250;
-    const boxHeight = (menuOptions.length * 40) + 80;
-    const boxX = screenWidth - boxWidth - 20;
-    const boxY = (screenHeight - boxHeight) / 2;
+    const boxW = 250;
+    const boxH = menu.length * 40 + 80;
+    const boxX = screenWidth - boxW - 20;
+    const boxY = (screenHeight - boxH) / 2;
+
+    askContainer = scene.add.container(0, 0);
 
     const graphics = scene.add.graphics();
     graphics.fillStyle(0x000000, 0.7);
-    graphics.fillRect(boxX, boxY, boxWidth, boxHeight);
+    graphics.fillRect(boxX, boxY, boxW, boxH);
     graphics.lineStyle(2, currentTheme.buttonColor, 1);
-    graphics.strokeRect(boxX, boxY, boxWidth, boxHeight);
-    askBoxGraphics = graphics;
+    graphics.strokeRect(boxX, boxY, boxW, boxH);
+    askContainer.add(graphics);
 
-    scene.add.text(boxX + boxWidth / 2, boxY + 30, 'Ask for card:', {
+    const title = scene.add.text(boxX + boxW / 2, boxY + 30, 'Ask for card:', {
         fontSize: '24px',
         color: currentTheme.textColor,
         fontFamily: 'Arial',
     }).setOrigin(0.5);
+    askContainer.add(title);
 
-    askButtons = [];
-    menuOptions.forEach((option, index) => {
-        const optionText = scene.add.text(boxX + boxWidth / 2, boxY + 80 + index * 40, option.text, {
+    const buttons: Phaser.GameObjects.Text[] = menu.map((opt, i) => {
+        const txt = scene.add.text(boxX + boxW / 2, boxY + 80 + i * 40, opt.text, {
             fontSize: '28px',
             color: currentTheme.textColor,
             fontFamily: 'Arial',
         }).setOrigin(0.5);
-        askButtons.push(optionText);
+        // ! to bypass the null check, should always be defined
+        askContainer!.add(txt);
+        return txt;
     });
 
-    const updateSelection = () => {
-        askButtons.forEach((text, index) => {
-            text.setColor(index === selectedOptionIndex ? '#FFD700' : currentTheme.textColor);
-        });
+    const update = () => {
+        buttons.forEach((b, i) => b.setColor(i === selectedOptionIndex ? '#FFD700' : currentTheme.textColor));
     };
 
-    if (scene.input.keyboard) {
-        scene.input.keyboard.off('keydown-DOWN');
-        scene.input.keyboard.off('keydown-UP');
-        scene.input.keyboard.off('keydown-ENTER');
-
-        scene.input.keyboard.on('keydown-DOWN', () => {
-            selectedOptionIndex = (selectedOptionIndex + 1) % menuOptions.length;
-            updateSelection();
-        });
-
-        scene.input.keyboard.on('keydown-UP', () => {
-            selectedOptionIndex = (selectedOptionIndex - 1 + menuOptions.length) % menuOptions.length;
-            updateSelection();
-        });
-
-        scene.input.keyboard.on('keydown-ENTER', () => {
-            if (scene.input.keyboard) {
-                scene.input.keyboard.off('keydown-DOWN');
-                scene.input.keyboard.off('keydown-UP');
-                scene.input.keyboard.off('keydown-ENTER');
-            }
-
-            const selectedRank = menuOptions[selectedOptionIndex].value;
-            scene.input.enabled = false;
-
-            const success = manager.askPlayerForCard(
-                manager.players[0], // you
-                manager.players[1], // opponent
-                selectedRank
-            );
-
-            if (!success) {
-                console.log(`You asked for ${selectedRank}, but the opponent has no cards of that value.`);
-                manager.nextTurn();
-            } else {
-                console.log(`You successfully asked for ${selectedRank}.`);
-            }
-
-            renderHand(scene, player, manager);
-
-            if (manager.isGameOver()) {
-                const playerBooks = manager.players[0].books.length;
-                const opponentBooks = manager.players[1].books.length;
-                const winner = playerBooks > opponentBooks ? 'You' : 'Computer';
-                scene.scene.start('GameOver', { winner });
-                return;
-            }
-
-            // If player keeps turn, re-enable input and re-render Asker
-            if (manager.turnIndex === 0) {
-                scene.time.delayedCall(500, () => {
-                    Asker(scene, player, manager);
-                });
-            } else {
-                scene.time.delayedCall(1000, () => {
-                    handleAITurn(manager, scene);
-
-                    // After AI turn, check for game over again
-                    scene.time.delayedCall(1100, () => {
-                        if (manager.isGameOver()) {
-                            const playerBooks = manager.players[0].books.length;
-                            const opponentBooks = manager.players[1].books.length;
-                            const winner = playerBooks > opponentBooks ? 'You' : 'Computer';
-                            scene.scene.start('GameOver', { winner });
-                        }
-                    });
-                });
-            }
-        });
+    // Keyboard input handling
+    const kb = scene.input.keyboard;
+    if (!kb) {
+        console.error('Keyboard input not available');
+        return;
     }
+    kb.off('keydown-DOWN').off('keydown-UP').off('keydown-ENTER');
 
-    updateSelection();
+    kb.on('keydown-DOWN', () => {
+        selectedOptionIndex = (selectedOptionIndex + 1) % menu.length;
+        update();
+    });
+
+    kb.on('keydown-UP', () => {
+        selectedOptionIndex = (selectedOptionIndex - 1 + menu.length) % menu.length;
+        update();
+    });
+
+    kb.on('keydown-ENTER', () => {
+        kb.off('keydown-DOWN').off('keydown-UP').off('keydown-ENTER');
+        const rank = menu[selectedOptionIndex].value;
+        scene.input.enabled = false;
+        const ok = manager.askPlayerForCard(manager.players[0], manager.players[1], rank);
+        ok ? console.log(`Asked for ${rank}`) :
+             (console.log(`No ${rank}`), manager.nextTurn());
+        renderHand(scene, player, manager);
+
+        if (manager.isGameOver()) {
+            const winner = manager.players[0].books.length > manager.players[1].books.length ? 'You' : 'Computer';
+            scene.scene.start('GameOver', { winner });
+            return;
+        }
+
+        if (manager.turnIndex === 0) {
+            scene.time.delayedCall(500, () => Asker(scene, player, manager));
+        } else {
+            scene.time.delayedCall(1000, () => {
+                handleAITurn(manager, scene);
+                scene.time.delayedCall(1100, () => {
+                    if (manager.isGameOver()) {
+                        const winner = manager.players[0].books.length > manager.players[1].books.length ? 'You' : 'Computer';
+                        scene.scene.start('GameOver', { winner });
+                    } else {
+                        Asker(scene, player, manager);
+                    }
+                });
+            });
+        }
+    });
+
+    update();
 }
