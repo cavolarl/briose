@@ -1,12 +1,12 @@
 import { Deck } from './Deck';
 import { Player } from './Player';
-import { handleAITurn } from './AiManager';
 
 
 export class GameManager {
     deck: Deck;
     players: Player[];
     turnIndex: number = 0;
+    messages: string[] = [];
 
     constructor(playerNames: string[]) {
         this.deck = new Deck();
@@ -52,6 +52,15 @@ export class GameManager {
         const drawn = this.deck.draw(1);
         player.addCards(drawn);
         return drawn;
+    }
+
+    saveMessage(message: string) {
+        this.messages.push(message);
+        console.log(message);
+    }
+    
+    getLastFiveMessages(messages: string[]): string[] {
+        return messages.slice(-5);
     }
 
 

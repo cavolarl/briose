@@ -10,6 +10,7 @@ const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     parent: 'game-container',
     backgroundColor: '#028af8',
+    title: 'Go Fish',
     scene: [MainMenu, GameScene, GameOver, ThemeSelection],
     scale: {
         mode: Phaser.Scale.RESIZE,

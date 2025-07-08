@@ -7,6 +7,7 @@ import { renderHand } from '../helpers/renderHand';
 import { handleAITurn } from '../helpers/AiManager';
 import { Asker } from '../helpers/Asker';
 import { Theme } from '../themes';
+import { MessageBox } from '../helpers/MessageHandler';
 
 export class GameScene extends Scene{
     deck: Deck;
@@ -14,6 +15,7 @@ export class GameScene extends Scene{
     player: Player;
     playerScoreText: Phaser.GameObjects.Text;
     computerScoreText: Phaser.GameObjects.Text;
+    messageBox: MessageBox;
 
     constructor ()
     {
@@ -24,7 +26,7 @@ export class GameScene extends Scene{
     // Load all card images from the assets folder
         this.load.setBaseURL('assets');
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
-        const values = ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
+        const values = ['1','2','3','4','5','6','7','8','9','10','J','Q','K'];
         suits.forEach(suit => {
             values.forEach(value => {
                 this.load.image(`${suit}-${value}`, `card-${suit}-${value}.png`);
@@ -47,6 +49,10 @@ export class GameScene extends Scene{
         this.playerScoreText = this.add.text(10, 10, 'Your Score: 0', { fontSize: '24px', color: currentTheme.textColor });
         this.computerScoreText = this.add.text(this.scale.width - 10, 10, 'Computer Score: 0', { fontSize: '24px', color: currentTheme.textColor }).setOrigin(1, 0);
 
+        // Add the message box to the scene (e.g., bottom left corner)
+        this.messageBox = new MessageBox(this, this.manager, 10, this.scale.height - 160, 400, 140);
+        this.add.existing(this.messageBox);
+
         EventBus.emit('current-scene-ready', this);
         this.updateHand();
         this.updateScores();
@@ -61,10 +67,11 @@ export class GameScene extends Scene{
     }
 
     updateHand() {
-        console.log('Before renderHand:', this.children.list);
-        renderHand(this, this.player, this.manager);
-        console.log('After renderHand:', this.children.list);
+        renderHand(this, this.player, this.manager, this.messageBox);
         this.updateScores();
+        if (this.messageBox) {
+            this.messageBox.updateMessages(); // <-- Update messages after hand changes
+        }
     }
 
     updateScores() {

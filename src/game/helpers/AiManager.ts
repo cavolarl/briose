@@ -1,46 +1,46 @@
 import { GameManager } from './GameManager';
 import { renderHand } from './renderHand';
 import { Scene } from 'phaser';
-import { Asker } from './Asker';
+import { MessageBox } from './MessageHandler';
 
-export function handleAITurn(manager: GameManager, scene: Scene) {
+export function handleAITurn(manager: GameManager, scene: Scene, messageBox: MessageBox) {
     const ai = manager.players[1];
     const player = manager.players[0];
 
     const values = Array.from(new Set(ai.hand.map(c => c.split('-')[1])));
     const chosenValue = Phaser.Utils.Array.GetRandom(values);
 
-    console.log(`AI asks for ${chosenValue}`);
-    console.log(`AI's hand: ${ai.hand.join(', ')}`);
-
     const success = manager.askPlayerForCard(ai, player, chosenValue);
 
     if (!success) {
-        console.log(`AI asked for ${chosenValue}, but you have no cards of that value.`);
+        manager.saveMessage(`AI asked for ${chosenValue}, but you have no cards of that value.`);
         if (manager.deck.cards.length > 0) {
-            console.log(`AI drew a card from the deck.`);
+            manager.saveMessage(`AI drew a card from the deck.`);
+            messageBox.updateMessages();
         } else {
-            console.log(`No cards left in the deck for AI to draw.`);
+            manager.saveMessage(`No cards left in the deck for AI to draw.`);
+            messageBox.updateMessages();
         }
 
-        renderHand(scene, player, manager);
+        renderHand(scene, player, manager, messageBox);
 
         // End AI turn after delay
         scene.time.delayedCall(1000, () => {
             manager.nextTurn();
-            renderHand(scene, player, manager);
+            renderHand(scene, player, manager, messageBox);
             if (manager.turnIndex === 0) {
-                renderHand(scene, player, manager);
+                renderHand(scene, player, manager, messageBox);
             }
         });
 
     } else {
-        console.log(`AI successfully asked for ${chosenValue}.`);
-        renderHand(scene, player, manager);
+        manager.saveMessage(`AI successfully asked for ${chosenValue}.`);
+        messageBox.updateMessages();
+        renderHand(scene, player, manager, messageBox);
 
         // Continue AI turn after delay
         scene.time.delayedCall(1000, () => {
-            handleAITurn(manager, scene);
+            handleAITurn(manager, scene, messageBox);
         });
     }
 }
