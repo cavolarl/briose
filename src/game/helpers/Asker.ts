@@ -25,7 +25,7 @@ export function Asker(scene: Scene, player: Player, manager: GameManager, messag
     // Logic to handle the case where the player has no cards left, uncertain if this works as intended due to difficulty debugging
     if (player.hand.length === 0 && !manager.deck.isEmpty()) {
         manager.drawCard(player);
-        player.checkForBooks();
+        manager.checkForBooks(player);
         renderHand(scene, player, manager, messageBox);
         manager.nextTurn();
 

@@ -22,29 +22,4 @@ export class Player {
         // Check for exact rank match
         return this.hand.some(card => card.split('-')[1] === value);
     }
-
-    // Logic to check for books (four of a kind)
-    checkForBooks(): string[] {
-        const counts: { [value: string]: number } = {};
-
-        // Count occurrences of each rank
-        this.hand.forEach(card => {
-            const value = card.split('-')[1];
-            counts[value] = (counts[value] || 0) + 1;
-        });
-
-        const completedBooks: string[] = [];
-
-        for (const value in counts) {
-            if (counts[value] === 4) {
-                this.removeCards(value);
-                this.books.push(value);
-                completedBooks.push(value);
-            }
-        }
-
-        console.log(`${this.name} completed books: ${completedBooks.join(', ')}`);
-
-        return completedBooks;
-    }
 }
