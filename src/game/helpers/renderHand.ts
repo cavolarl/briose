@@ -3,6 +3,7 @@ import { Player } from './Player';
 import { GameManager } from './GameManager';
 import { Asker } from './Asker';
 import { currentTheme } from '../EventBus';
+import { MessageBox } from './MessageHandler';
 
 let playerCardImages: Phaser.GameObjects.Image[] = [];
 let opponentCardImages: Phaser.GameObjects.Image[] = [];
@@ -13,7 +14,8 @@ let opponentBookImages: Phaser.GameObjects.Image[] = [];
 export function renderHand(
     scene: Scene,
     player: Player,
-    manager: GameManager
+    manager: GameManager,
+    messageBox: MessageBox
 ): void {
     // Destroy previous objects created by renderHand
     playerCardImages.forEach(img => img.destroy());
@@ -118,6 +120,6 @@ export function renderHand(
 
     // Render Asker if it's the player's turn
     if (manager.turnIndex === 0) {
-    Asker(scene, player, manager);
+    Asker(scene, player, manager, messageBox);
     }
 }

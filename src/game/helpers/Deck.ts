@@ -8,7 +8,7 @@ export class Deck {
 
     reset() {
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
-        const values = ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
+        const values = ['1','2','3','4','5','6','7','8','9','10','J','Q','K'];
         this.cards = [];
 
         for (const suit of suits) {
