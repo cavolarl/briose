@@ -5,7 +5,6 @@ import { Theme } from './themes';
 export const EventBus = new Events.EventEmitter();
 
 export const themes: Theme[] = [
-    { name: 'Default', backgroundColor: '#24252A', cardBack: 'card-back1', buttonColor: 0x4ecca3, textColor: '#232931' },
     { name: 'Forest', backgroundColor: '#34495e', cardBack: 'card-back2', buttonColor: 0x2e8b57, textColor: '#ecf0f1' },
     { name: 'Ocean', backgroundColor: '#3498db', cardBack: 'card-back3', buttonColor: 0x4682b4, textColor: '#ecf0f1' },
 ];
