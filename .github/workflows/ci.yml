@@ -29,8 +29,8 @@ jobs:
       run: npm run build
 
     - name: Build Docker images
-      run: docker-compose build
+      run: docker compose build
 
     - name: Run tests with Docker Compose
-      run: docker-compose run --rm templateangular-tests
+      run: docker compose run --rm templateangular-tests
 
