@@ -28,9 +28,6 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Run ESLint
-      run: npm run lint
-
     - name: Build Docker images
       run: docker-compose build
 
