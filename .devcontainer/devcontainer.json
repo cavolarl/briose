@@ -4,6 +4,7 @@
 	"name": "Briose Dev Container",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"mounts": ["source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"],
 	"features": {
 		"ghcr.io/devcontainers/features/git-lfs:1": {},
 		"ghcr.io/devcontainers-extra/features/angular-cli:2": {}
@@ -16,7 +17,7 @@
 	"forwardPorts": [3000, 4200],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm install && npm run dev",
+	"postCreateCommand": "sudo apt update && sudo apt install -y docker.io && npm install",
 	"customizations": {
 		"vscode": {
 			"extensions": [
