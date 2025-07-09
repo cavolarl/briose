@@ -1,31 +1,19 @@
 {
-    "name": "template-angular",
-    "version": "1.1.0",
-    "description": "A Phaser 3 project template that demonstrates Angular communication.",
+    "name": "briose",
+    "version": "1.0",
+    "description": "A card game built with Phaser and Angular.",
     "scripts": {
         "ng": "ng",
         "dev": "node log dev & ng serve",
         "build": "node log.js build & ng build --base-href='./'",
-        "dev-nolog": "ng serve",
-        "build-nolog": "ng build --base-href='./'"
+        "lint": "ng lint",
+        "test": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/phaserjs/template-angular.git"
+        "url": "git+https://github.com/cavolarl/briose.git"
     },
-    "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
     "license": "MIT",
-    "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
-    "bugs": {
-        "url": "https://github.com/phaserjs/template-angular/issues"
-    },
-    "homepage": "https://github.com/phaserjs/template-angular#readme",
-    "keywords": [
-        "phaser",
-        "phaser3",
-        "angular",
-        "Angular"
-    ],
     "dependencies": {
         "@angular/common": "^19.2.0",
         "@angular/compiler": "^19.2.0",
@@ -50,6 +38,7 @@
         "karma-coverage": "~2.2.0",
         "karma-jasmine": "~5.1.0",
         "karma-jasmine-html-reporter": "~2.1.0",
+        "puppeteer": "^24.12.0",
         "typescript": "~5.7.2"
     }
 }
