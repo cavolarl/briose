@@ -17,7 +17,7 @@ export class MainMenu extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(currentTheme.backgroundColor);
 
         // Add a title text
-        this.add.text(width / 2, height / 2 - 100, 'My Game', {
+        this.add.text(width / 2, height / 2 - 100, 'briose', {
             fontSize: '48px',
             color: currentTheme.textColor,
             fontFamily: 'Arial',
@@ -39,6 +39,13 @@ export class MainMenu extends Phaser.Scene {
             }).setOrigin(0.5);
             optionTexts.push(optionText);
         });
+
+        // Add a text below the menu options
+        this.add.text(width / 2, height - 50, 'Use UP/DOWN to navigate, ENTER to select', {
+            fontSize: '20px',
+            color: currentTheme.textColor,
+            fontFamily: 'Arial',
+        }).setOrigin(0.5);
 
         const updateSelection = () => {
             optionTexts.forEach((text, index) => {

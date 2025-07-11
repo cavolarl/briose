@@ -21,6 +21,8 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"ms-vscode.azurecli",
+				"ms-vscode.vscode-node-azure-pack",
 				"Angular.ng-template",
 				"ms-vscode-remote.remote-containers",
 				"ms-azuretools.vscode-containers",
