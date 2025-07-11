@@ -16,7 +16,7 @@
                         "allowedCommonJsDependencies": [
                             "phaser"
                         ],
-                        "outputPath": "dist/template-angular",
+                        "outputPath": "dist/briose",
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": [

@@ -4,5 +4,7 @@
     "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
     "typescript.format.placeOpenBraceOnNewLineForFunctions": true,
     "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+    "appService.defaultWebAppToDeploy": "/subscriptions/3a3c8de9-841e-42cd-85ef-74a4dba0a82c/resourceGroups/BrioseAppService/providers/Microsoft.Web/sites/briose",
+    "appService.deploySubpath": "dist/briose",
 
 }

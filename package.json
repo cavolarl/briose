@@ -1,6 +1,6 @@
 {
     "name": "briose",
-    "version": "1.0",
+    "version": "0.1.0",
     "description": "A card game built with Phaser and Angular.",
     "scripts": {
         "ng": "ng",
